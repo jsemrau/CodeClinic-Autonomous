@@ -1,0 +1,6 @@
+streamlit
+langchain
+openai
+google-serp-api
+google-search-results
+typing
