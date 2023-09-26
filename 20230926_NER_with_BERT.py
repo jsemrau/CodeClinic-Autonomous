@@ -88,8 +88,7 @@ random_index = random.randint(0, len(data) - 1)
 #Load Models    
 #modvar="AhmedTaha012/finance-ner-v0.0.9-finetuned-ner"
 #modvar="dslim/bert-base-NER"
-#model_name="dslim/bert-large-NER"
-model_name="LukeForEntityClassification"
+model_name="dslim/bert-large-NER"
 #Setup AutoTokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForTokenClassification.from_pretrained(model_name)
