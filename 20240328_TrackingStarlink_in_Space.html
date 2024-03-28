@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Morpheus Space Satellites</title>
+  <meta charset="utf-8">
+  <meta title´="Morpheus Space Satellites">
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.91/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.91/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/satellite.js/4.0.0/satellite.js"></script>
+  <link href="style.css" rel="stylesheet">
+</head>
+<body>
+  <div id="loading">
+    <h1>Loading...</h1>
+
+
+  </div>
+  <div id="cesiumContainer"></div>
+  <script>
+    // Initialize the Cesium viewer.
+    const viewer = new Cesium.Viewer('cesiumContainer', {
+      imageryProvider: new Cesium.TileMapServiceImageryProvider({
+        url: Cesium.buildModuleUrl("Assets/Textures/NaturalEarthII"),
+      }),
+      baseLayerPicker: false, geocoder: false, homeButton: false, infoBox: false,
+      navigationHelpButton: false, sceneModePicker: false
+    });
+    // This causes a bug on android, see: https://github.com/CesiumGS/cesium/issues/7871
+    viewer.scene.globe.enableLighting = true;
+    // These 2 lines are published by NORAD and allow us to predict where
+    // the Satellites is at any given moment. They are regularly updated.
+    // For this exercise, we don't need too accurate data. 
+    
+    // Define TLE data for additional satellites
+    const SATELLITES_TLE =[{"name": "STARLINK-31373", "data": {"line1": "1 58965U 24031A   24060.66667824 -.01676072  00000-0 -18700-1 0  9998", "line2": "2 58965  53.1601 129.9602 0001379  66.9875  77.0951 15.65394174  3402"}}, {"name": "STARLINK-31449", "data": {"line1": "1 58966U 24031B   24061.25001157 -.01752543  00000-0 -21005-1 0  9996", "line2": "2 58966  53.1603 127.1020 0001161  99.3640  93.5489 15.63233626  3465"}}, {"name": "STARLINK-31314", "data": {"line1": "1 58967U 24031C   24060.33334491 -.01743756  00000-0 -18581-1 0  9996", "line2": "2 58967  53.1608 131.5877 0001283  65.6914   1.9529 15.66662160  3342"}}, {"name": "STARLINK-31335", "data": {"line1": "1 58969U 24031E   24060.58334491 -.01685217  00000-0 -18612-1 0  9997", "line2": "2 58969  53.1605 130.3539 0001008  59.1979 342.6800 15.65667543  3365"}}, {"name": "STARLINK-31368", "data": {"line1": "1 58970U 24031F   24060.33334491 -.01739879  00000-0 -18560-1 0  9998", "line2": "2 58970  53.1612 131.5764 0001096  80.6950 352.7764 15.66629666  3325"}}, {"name": "STARLINK-31333", "data": {"line1": "1 58971U 24031G   24060.91667824 -.01762901  00000-0 -20164-1 0  9997", "line2": "2 58971  53.1599 128.7119 0000870  89.9562  34.8938 15.64427970  3437"}}, {"name": "STARLINK-31351", "data": {"line1": "1 58972U 24031H   24060.91667824 -.01762807  00000-0 -20171-1 0  9991", "line2": "2 58972  53.1601 128.7084 0000887  82.7627  44.0077 15.64417668  3434"}}, {"name": "STARLINK-31356", "data": {"line1": "1 58968U 24031D   24060.58334491  .00237118  00000-0  20965-2 0  9991", "line2": "2 58968  53.1609 130.3559 0001881  60.9718 341.0963 15.67391524  3346"}}, {"name": "STARLINK-31361", "data": {"line1": "1 58974U 24031K   24060.16667824 -.01692017  00000-0 -17567-1 0  9990", "line2": "2 58974  53.1609 132.3813 0001168 111.6502 106.9831 15.67195568  3321"}}, {"name": "STARLINK-31365", "data": {"line1": "1 58973U 24031J   24060.58334491 -.01683604  00000-0 -18632-1 0  9992", "line2": "2 58973  53.1607 130.3350 0000864  71.1794 340.3624 15.65615617  3365"}}, {"name": "STARLINK-31369", "data": {"line1": "1 58975U 24031L   24061.25001157 -.01743693  00000-0 -20967-1 0  9998", "line2": "2 58975  53.1606 127.0684 0001263 100.5802 109.5119 15.63135564  3461"}}, {"name": "STARLINK-31324", "data": {"line1": "1 58976U 24031M   24060.16667824 -.01693696  00000-0 -17608-1 0  9992", "line2": "2 58976  53.1613 132.3686 0001225  98.3817 126.0965 15.67165625  3298"}}, {"name": "STARLINK-31358", "data": {"line1": "1 58977U 24031N   24060.91667824 -.01761883  00000-0 -20200-1 0  9992", "line2": "2 58977  53.1598 128.6879 0001047  72.9490  63.4247 15.64365645  3399"}}, {"name": "STARLINK-31355", "data": {"line1": "1 58978U 24031P   24061.25001157 -.01745000  00000-0 -21010-1 0  9995", "line2": "2 58978  53.1602 127.0549 0001074 103.5083 112.3072 15.63106667  3466"}}, {"name": "STARLINK-31380", "data": {"line1": "1 58979U 24031Q   24060.66667824 -.01675004  00000-0 -18798-1 0  9994", "line2": "2 58979  53.1600 129.9054 0001006  70.7345 100.3626 15.65250700  3404"}}, {"name": "STARLINK-31339", "data": {"line1": "1 58981U 24031S   24060.66667824 -.01674132  00000-0 -18794-1 0  9994", "line2": "2 58981  53.1601 129.9030 0001161  63.8290 109.1983 15.65239724  3402"}}, {"name": "STARLINK-31353", "data": {"line1": "1 58980U 24031R   24060.41668981 -.01728667  00000-0 -18754-1 0  9990", "line2": "2 58980  53.1606 131.1235 0000973  62.1783 142.8900 15.66194931  3311"}}, {"name": "STARLINK-31360", "data": {"line1": "1 58982U 24031T   24060.33334491 -.01732887  00000-0 -18567-1 0  9990", "line2": "2 58982  53.1606 131.5289 0001538  64.8502  31.9227 15.66502912  3325"}}, {"name": "STARLINK-31384", "data": {"line1": "1 58983U 24031U   24060.91667824 -.01765004  00000-0 -20289-1 0  9995", "line2": "2 58983  53.1598 128.6645 0000874  87.3795  60.5111 15.64306751  3438"}}, {"name": "STARLINK-31229", "data": {"line1": "1 58986U 24031X   24060.33334491 -.01637729  00000-0 -17602-1 0  9992", "line2": "2 58986  53.1607 131.5118 0001591  73.5085  30.8089 15.66237465  3325"}}];
+
+    const satrec_array = []
+    
+    for (i=0; i<SATELLITES_TLE.length; i++) {
+
+      satrec_array.push(satellite.twoline2satrec(
+        SATELLITES_TLE[i]['data']['line1'].trim(), 
+        SATELLITES_TLE[i]['data']['line2'].trim()
+      ));
+
+    }
+    
+    //satrec=satrec_array[3]
+
+    // Give SatelliteJS the TLE's and a specific time.
+    // Get back a longitude, latitude, height (km).
+    // We're going to generate a position every 10 seconds from now until 6 seconds from now. 
+    // This applies to all satellites
+    const totalSeconds = 60 * 60 * 6;
+    const timestepInSeconds = 10;
+    const start = Cesium.JulianDate.fromDate(new Date());
+    const stop = Cesium.JulianDate.addSeconds(start, totalSeconds, new Cesium.JulianDate());
+    viewer.clock.startTime = start.clone();
+    viewer.clock.stopTime = stop.clone();
+    viewer.clock.currentTime = start.clone();
+    viewer.timeline.zoomTo(start, stop);
+    viewer.clock.multiplier = 5;
+    viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP;
+    
+    //initialize an empty satellite position
+
+    //Now create satellite positions for all in the array
+
+    sat_trajectories_array=[]
+    for (i=0; i<SATELLITES_TLE.length; i++) {
+
+        satrec=satrec_array[i]
+
+        const sat_positionsOverTime = new Cesium.SampledPositionProperty();
+        
+        for (let i = 0; i < totalSeconds; i+= timestepInSeconds) {
+          const time = Cesium.JulianDate.addSeconds(start, i, new Cesium.JulianDate());
+          const jsDate = Cesium.JulianDate.toDate(time);
+
+          //this propagation applies to a single satellite
+          // hence you need a loop here
+          const positionAndVelocity = satellite.propagate(satrec, jsDate);
+          const gmst = satellite.gstime(jsDate);
+          const p   = satellite.eciToGeodetic(positionAndVelocity.position, gmst);
+
+          const position = Cesium.Cartesian3.fromRadians(p.longitude, p.latitude, p.height * 1000);
+          sat_positionsOverTime.addSample(time, position);
+        }
+        
+        // Visualize the satellite with a red dot.
+        const satellitePoint = viewer.entities.add({
+          position: sat_positionsOverTime,
+          label: {text: SATELLITES_TLE[i]["name"], font: '12px Helvetica',} ,
+          point: { pixelSize: 5, color: Cesium.Color.BLUE },
+          
+        });
+
+           sat_trajectories_array.push(satellitePoint)
+
+      }
+    
+    // Set the camera to follow the satellite 
+    viewer.trackedEntity = sat_trajectories_array[1];
+    
+    let currentIndex = 0;
+
+    // Function to switch to the next tracked entity
+    function switchToNextEntity() {
+        savedCameraPosition= viewer.scene.camera.position.clone()
+        viewer.trackedEntity = sat_trajectories_array[currentIndex];
+        currentIndex = (currentIndex + 1) % sat_trajectories_array.length;
+        viewer.trackedEntity.viewFrom = savedCameraPosition;
+    }
+
+    // the move doesn't work for constellations
+    animate_me=false;
+    if (animate_me) {
+
+      // Set an interval to switch entities every 10 seconds
+      const interval = 10000; // 10 seconds in milliseconds
+      setInterval(switchToNextEntity, interval);
+    
+    }
+    
+    // Wait for globe to load then zoom out     
+    let initialized = false;
+    viewer.scene.globe.tileLoadProgressEvent.addEventListener(() => {
+      if (!initialized && viewer.scene.globe.tilesLoaded === true) {
+        viewer.clock.shouldAnimate = true;
+        initialized = true;
+        viewer.scene.camera.zoomOut(7000000);
+        document.querySelector("#loading").classList.toggle('disappear', true)
+      }
+    });
+
+    
+
+  </script>
+</body>
+</html>
