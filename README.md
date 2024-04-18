@@ -38,5 +38,3 @@ Thank you for joining me on this journey of exploration and learning. Let's dive
 
 Happy coding,
 Jan
-
-Note: This README is just a template. Be sure to customize it to fit your own writing style, content, and repository structure.
